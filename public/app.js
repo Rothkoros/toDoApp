@@ -7,6 +7,7 @@ const input = document.getElementById('input');
 const taskInput = document.getElementById('taskNameInput')
 const modalTitle = document.getElementById('exampleModalLabel')
 let selectedList
+let selectedTask
 
 // Classes names
 const checkit = "fa-check-circle";
@@ -85,6 +86,19 @@ function selectList(event) {
 
 }
 
+function selectTask(event) {
+    const taskId = event.target.id
+    console.log(taskId)
+
+    selectedList.tasks.forEach(task => {
+
+        if (task.id === Number(taskId)) {
+            selectedTask = task
+        }
+    })
+    console.log(selectedTask)
+}
+
 function renderTasks() {
     modalTitle.innerHTML = selectedList.name
 
@@ -97,7 +111,7 @@ function renderTasks() {
         tasksToRender += `
         <li class="item">
           <i class="fa ${task.done} co" job="complete" id="${task.id}"></i>
-          <p id="${task.id}" class="text ${task.done ? LINE_THROUGH : ""}" onclick="selectList(event)">${task.name}</p>
+          <p id="${task.id}" class="text ${task.done ? LINE_THROUGH : ""}" onclick="selectTask(event)">${task.name}</p>
           <i class="fa fa-trash-o de" job="delete" id="${task.id}"></i>
         </li>
       `;
@@ -106,23 +120,6 @@ function renderTasks() {
     modalContent.insertAdjacentHTML("beforeend", tasksToRender)
 }
 
-function addTask(toDo, id, done, trash) {
-
-    if (trash) { return; }
-
-    const DONE = done ? checkit : UNCHECK;
-    const LINE = done ? LINE_THROUGH : "";
-
-    const item = `  <li class="item">
-                      <i class="fa ${DONE} co" job="complete" id="${id}"></i>
-                      <p class="text ${LINE}">${toDo}</p>
-                      <i class="fa fa-trash-o de" job="delete" id="${id}"></i>
-                      </li>
-                      `;
-
-    const position = "beforeend";
-    modalContent.insertAdjacentHTML(position, item);
-}
 
 
 // add an item to the list user the enter key

@@ -2,7 +2,10 @@
 const clear = document.querySelector('.clear');
 const dateElement = document.getElementById('date');
 const list = document.getElementById('list');
+const modalContent = document.getElementById('modal-content')
 const input = document.getElementById('input');
+const taskInput = document.getElementById('taskNameInput')
+let selectedList
 
 // Classes names
 const checkit = "fa-check-circle";
@@ -55,7 +58,7 @@ function addToDo(toDo, id, done, trash) {
 
     const item = `  <li class="item">
                         <i class="fa ${DONE} co" job="complete" id="${id}"></i>
-                        <p class="text ${LINE}" data-toggle="modal" data-target="#exampleModal">${toDo}</p>
+                        <p id="${id}" class="text ${LINE}" onclick="selectList(event)" data-toggle="modal" data-target="#exampleModal">${toDo}</p>
                         <i class="fa fa-trash-o de" job="delete" id="${id}"></i>
                         </li>
                         `;
@@ -67,8 +70,34 @@ function addToDo(toDo, id, done, trash) {
     list.insertAdjacentHTML(position, item);
 }
 
+function selectList(event) {
+    const listId = event.target.id
+
+    selectedList = LIST.find(element => element.id === listId)
+
+}
+
+function addTask(toDo, id, done, trash) {
+
+    if (trash) { return; }
+
+    const DONE = done ? checkit : UNCHECK;
+    const LINE = done ? LINE_THROUGH : "";
+
+    const item = `  <li class="item">
+                      <i class="fa ${DONE} co" job="complete" id="${id}"></i>
+                      <p class="text ${LINE}">${toDo}</p>
+                      <i class="fa fa-trash-o de" job="delete" id="${id}"></i>
+                      </li>
+                      `;
+
+    const position = "beforeend";
+    modalContent.insertAdjacentHTML(position, item);
+}
+
+
 // add an item to the list user the enter key
-document.addEventListener("keyup", function(even) {
+input.addEventListener("keyup", function(even) {
     if (event.keyCode == 13) {
         const toDo = input.value;
 
@@ -80,7 +109,31 @@ document.addEventListener("keyup", function(even) {
                 name: toDo,
                 id: id,
                 done: false,
-                trash: false
+                trash: false,
+                tasks: []
+            });
+
+            // add item to localstorage (this code must be added where the LIST array updated)
+            localStorage.setItem("TODO", JSON.stringify(LIST));
+
+            id++;
+        }
+        input.value = "";
+    }
+});
+taskInput.addEventListener("keyup", function(even) {
+    if (event.keyCode == 13) {
+        const toDo = input.value;
+
+        // if the input isn't empty
+        if (toDo) {
+            addToDo(toDo, id, false, false);
+
+            selectedList.tasks.push({
+                name: toDo,
+                id: id,
+                done: false,
+                trash: false,
             });
 
             // add item to localstorage (this code must be added where the LIST array updated)

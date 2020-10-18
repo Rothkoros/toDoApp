@@ -2,9 +2,10 @@
 const clear = document.querySelector('.clear');
 const dateElement = document.getElementById('date');
 const list = document.getElementById('list');
-const modalContent = document.getElementById('modal-content')
+const modalContent = document.getElementById('modal-body')
 const input = document.getElementById('input');
 const taskInput = document.getElementById('taskNameInput')
+const modalTitle = document.getElementById('exampleModalLabel')
 let selectedList
 
 // Classes names
@@ -73,8 +74,34 @@ function addToDo(toDo, id, done, trash) {
 function selectList(event) {
     const listId = event.target.id
 
-    selectedList = LIST.find(element => element.id === listId)
+    LIST.forEach(list => {
+        console.log(list)
+        if (list.id === Number(listId)) {
+            selectedList = list
+        }
+    })
 
+    modalTitle.innerHTML = selectedList.name
+
+    // Remove all modal content
+    modalContent.innerHTML = ""
+
+    // Loop through selectedList.lists and render each task into the modal content
+    tasksToRender = ""
+    selectedList.tasks.forEach(task => {
+            tasksToRender += `
+      <li class="item">
+                        <i class="fa ${task.done} co" job="complete" id="${task.id}"></i>
+                        <p id="${task.id}" class="text ${task.done ? LINE_THROUGH : ""}" onclick="selectList(event)">${toDo}</p>
+                        <i class="fa fa-trash-o de" job="delete" id="${task.id}"></i>
+                        </li>
+                        `;
+        })
+        // modalContent.innerHTML = String(Math.random())
+        // name: toDo,
+        //             id: id,
+        //             done: false,
+        //             trash: false,
 }
 
 function addTask(toDo, id, done, trash) {
@@ -97,7 +124,7 @@ function addTask(toDo, id, done, trash) {
 
 
 // add an item to the list user the enter key
-input.addEventListener("keyup", function(even) {
+input.addEventListener("keyup", function(event) {
     if (event.keyCode == 13) {
         const toDo = input.value;
 
@@ -164,14 +191,17 @@ function removeToDo(element) {
 // target the items created dynamically
 list.addEventListener("click", function(event) {
     const element = event.target; // return the clicked element inside list
-    const elementJob = element.attributes.job.value; // complete or delete
+    if (element.attributes.job) {
 
-    if (elementJob == "complete") {
-        completeToDo(element);
-    } else if (elementJob == "delete") {
-        removeToDo(element);
+        const elementJob = element.attributes.job.value; // complete or delete
+
+        if (elementJob == "complete") {
+            completeToDo(element);
+        } else if (elementJob == "delete") {
+            removeToDo(element);
+        }
+
+        // add item to localstorage (this code must be added where the LIST array updated)
+        localStorage.setItem("TODO", JSON.stringify(LIST));
     }
-
-    // add item to localstorage (this code must be added where the LIST array updated)
-    localStorage.setItem("TODO", JSON.stringify(LIST));
 })

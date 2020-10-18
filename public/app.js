@@ -33,7 +33,7 @@ if (data) {
 // load items to the user's interface
 function loadList(array) {
     array.forEach(function(item) {
-        addToDo(item.name, item.id, item.done, item.trash);
+        addList(item.name, item.id, item.done, item.trash);
     });
 }
 
@@ -50,7 +50,7 @@ const today = new Date();
 dateElement.innerHTML = today.toLocaleDateString("en-US", options);
 
 // add to do function
-function addToDo(toDo, id, done, trash) {
+function addList(toDo, id, done, trash) {
 
     if (trash) { return; }
 
@@ -81,6 +81,11 @@ function selectList(event) {
         }
     })
 
+    renderTasks()
+
+}
+
+function renderTasks() {
     modalTitle.innerHTML = selectedList.name
 
     // Remove all modal content
@@ -89,19 +94,16 @@ function selectList(event) {
     // Loop through selectedList.lists and render each task into the modal content
     tasksToRender = ""
     selectedList.tasks.forEach(task => {
-            tasksToRender += `
-      <li class="item">
-                        <i class="fa ${task.done} co" job="complete" id="${task.id}"></i>
-                        <p id="${task.id}" class="text ${task.done ? LINE_THROUGH : ""}" onclick="selectList(event)">${toDo}</p>
-                        <i class="fa fa-trash-o de" job="delete" id="${task.id}"></i>
-                        </li>
-                        `;
-        })
-        // modalContent.innerHTML = String(Math.random())
-        // name: toDo,
-        //             id: id,
-        //             done: false,
-        //             trash: false,
+        tasksToRender += `
+        <li class="item">
+          <i class="fa ${task.done} co" job="complete" id="${task.id}"></i>
+          <p id="${task.id}" class="text ${task.done ? LINE_THROUGH : ""}" onclick="selectList(event)">${task.name}</p>
+          <i class="fa fa-trash-o de" job="delete" id="${task.id}"></i>
+        </li>
+      `;
+    })
+
+    modalContent.insertAdjacentHTML("beforeend", tasksToRender)
 }
 
 function addTask(toDo, id, done, trash) {
@@ -130,7 +132,7 @@ input.addEventListener("keyup", function(event) {
 
         // if the input isn't empty
         if (toDo) {
-            addToDo(toDo, id, false, false);
+            addList(toDo, id, false, false);
 
             LIST.push({
                 name: toDo,
@@ -148,13 +150,14 @@ input.addEventListener("keyup", function(event) {
         input.value = "";
     }
 });
-taskInput.addEventListener("keyup", function(even) {
+taskInput.addEventListener("keyup", function(event) {
+
     if (event.keyCode == 13) {
-        const toDo = input.value;
+
+        const toDo = taskInput.value;
 
         // if the input isn't empty
         if (toDo) {
-            addToDo(toDo, id, false, false);
 
             selectedList.tasks.push({
                 name: toDo,
@@ -162,6 +165,8 @@ taskInput.addEventListener("keyup", function(even) {
                 done: false,
                 trash: false,
             });
+
+            renderTasks()
 
             // add item to localstorage (this code must be added where the LIST array updated)
             localStorage.setItem("TODO", JSON.stringify(LIST));
